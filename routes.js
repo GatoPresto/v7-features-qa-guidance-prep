@@ -21,3 +21,7 @@ export default new Router()
   // Otherwise user will see 412 status code
   // https://docs.edg.io/guides/v7/performance/traditional_sites#understanding-caching-and-prefetching
   .match({}, { response: { allow_prefetching_uncached_content: true } })
+
+  // Compress Content Types
+  // https://docs.edg.io/guides/v7/performance/rules/features#compress-content-types
+  .match({}, { response: { compress_content_types: ["text/plain"] } });
