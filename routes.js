@@ -24,4 +24,9 @@ export default new Router()
 
   // Compress Content Types
   // https://docs.edg.io/guides/v7/performance/rules/features#compress-content-types
-  .match({}, { response: { compress_content_types: ["text/plain"] } });
+  .match({}, { response: { compress_content_types: ["text/plain"] } })
+
+  // Optimize Images
+  // https://docs.edg.io/guides/v7/performance/rules/features#optimize-images
+  // https://docs.edg.io/guides/v7/performance/image_optimization#enabling-image-optimization
+  .match({}, { response: { optimize_images: true } })
