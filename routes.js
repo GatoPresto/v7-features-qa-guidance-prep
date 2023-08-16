@@ -62,3 +62,7 @@ export default new Router()
       }
     },
   )
+
+  // Follow Redirects
+  // https://docs.edg.io/guides/v7/performance/rules/features#follow-redirects
+  .match({}, { url: { follow_redirects: true } })
