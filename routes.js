@@ -50,3 +50,15 @@ export default new Router()
       },
     }
   )
+
+  // Set Variables
+  // https://docs.edg.io/guides/v7/performance/rules/features#set-variables
+  .match(
+    {},
+    {
+      set_variables: { test: "some value", another_variable: "another value" },
+      response: {
+
+      }
+    },
+  )
