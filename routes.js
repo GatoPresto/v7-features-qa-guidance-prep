@@ -15,3 +15,9 @@ export default new Router()
 
   // plugin enabling basic Edgio functionality
   .use(edgioRoutes)
+
+  // Allow Prefetching of Uncached Content
+  // https://docs.edg.io/guides/v7/performance/rules/features#allow-prefetching-of-uncached-content
+  // Otherwise user will see 412 status code
+  // https://docs.edg.io/guides/v7/performance/traditional_sites#understanding-caching-and-prefetching
+  .match({}, { response: { allow_prefetching_uncached_content: true } })
