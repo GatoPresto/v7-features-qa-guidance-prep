@@ -30,3 +30,23 @@ export default new Router()
   // https://docs.edg.io/guides/v7/performance/rules/features#optimize-images
   // https://docs.edg.io/guides/v7/performance/image_optimization#enabling-image-optimization
   .match({}, { response: { optimize_images: true } })
+
+  // Set Done, Set Status Code & Set Response Body
+  // https://docs.edg.io/guides/v7/performance/rules/features#set-done - set done
+  // https://docs.edg.io/guides/v7/performance/rules/features#set-status-code - set status code
+  // https://docs.edg.io/guides/v7/performance/rules/features#set-response-body - set response body
+  .match(
+    {
+      path: '/search',
+      query: {
+        q: 'test'
+      }
+    },
+    {
+      response: {
+        set_done: true,
+        set_status_code: 403,
+        set_response_body: "Sorry, you can't see this page!",
+      },
+    }
+  )
