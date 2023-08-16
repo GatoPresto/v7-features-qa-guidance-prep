@@ -81,3 +81,16 @@ export default new Router()
     },
     origin: { set_origin: 'origin' },
   })
+
+  // URL Redirect
+  // https://docs.edg.io/guides/v7/performance/rules/features#url-redirect
+  .match('/edgio-redirect/:path*', {
+    url: {
+      url_redirect: {
+        source: '/edgio-redirect/:path*:optionalSlash(\\/?)?:optionalQuery(\\?.*)?',
+        syntax: 'path-to-regexp',
+        destination: '/:path*:optionalSlash:optionalQuery',
+      },
+    },
+    origin: { set_origin: 'origin' },
+  })
