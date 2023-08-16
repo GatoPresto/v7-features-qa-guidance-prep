@@ -66,3 +66,18 @@ export default new Router()
   // Follow Redirects
   // https://docs.edg.io/guides/v7/performance/rules/features#follow-redirects
   .match({}, { url: { follow_redirects: true } })
+
+  // Rewrite URL
+  // https://docs.edg.io/guides/v7/performance/rules/features#rewrite-url
+  .match('/edgio-redirect/:path*', {
+    url: {
+      url_rewrite: [
+        {
+          source: '/edgio-redirect/:path*:optionalSlash(\\/?)?:optionalQuery(\\?.*)?',
+          syntax: 'path-to-regexp',
+          destination: '/:path*:optionalSlash:optionalQuery',
+        },
+      ],
+    },
+    origin: { set_origin: 'origin' },
+  })
