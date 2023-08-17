@@ -57,8 +57,10 @@ export default new Router()
     {},
     {
       set_variables: { test: "some value", another_variable: "another value" },
-      response: {
-
+      headers: {
+        set_response_headers: {
+          'x-0-test': '%{usrvar_test}'
+        }
       }
     },
   )
