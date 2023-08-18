@@ -1,6 +1,6 @@
 // This file was added by edgio init.
 // You should commit this file to source control.
-import { Router, edgioRoutes } from '@edgio/core'
+import { Router, edgioRoutes, HTTP_HEADERS } from '@edgio/core'
 
 export default new Router()
   // Here is an example where we cache api/* at the edge but prevent caching in the browser
@@ -21,15 +21,23 @@ export default new Router()
   // Otherwise user will see 412 status code
   // https://docs.edg.io/guides/v7/performance/traditional_sites#understanding-caching-and-prefetching
   .match({}, { response: { allow_prefetching_uncached_content: true } })
+  // NOTE: old version of allow prefetching of cache miss
+  // import { prefetch } from '@layer0/prefetch/window
+  // prefetch('<some_url>', 'fetch', { includeCacheMisses: true })
 
   // Compress Content Types
   // https://docs.edg.io/guides/v7/performance/rules/features#compress-content-types
-  .match({}, { response: { compress_content_types: ["text/plain"] } })
+  .match({}, { response: { compress_content_types: ["text/plain", "text/html", "text/css"] } })
+  // NOTE: In old version: need to limit by content-type
+  .match({}, ({ setResponseHeader, setRequestHeader }) => {
+    setRequestHeader('Accept-Encoding', 'gzip, compress')
+    setResponseHeader(HTTP_HEADERS.contentEncoding, 'gzip, compress')
+  })
 
   // Optimize Images
   // https://docs.edg.io/guides/v7/performance/rules/features#optimize-images
   // https://docs.edg.io/guides/v7/performance/image_optimization#enabling-image-optimization
-  .match({}, { response: { optimize_images: true } })
+  .match('/static-assets/:path*.(jpg|bmp)', { response: { optimize_images: true } })
 
   // Set Done, Set Status Code & Set Response Body
   // https://docs.edg.io/guides/v7/performance/rules/features#set-done - set done
@@ -50,6 +58,38 @@ export default new Router()
       },
     }
   )
+  .match(
+    {
+      path: '/search',
+      query: {
+        q: 'test'
+      }
+    },({ send }) => {
+      send("Sorry, you can't see this page!", 403)
+    }
+  )
+  .match(
+    {
+      path: '/search',
+      query: {
+        q: 'test'
+      }
+    },({ setResponseCode, setResponseBody }) => {
+      setResponseCode(403)
+      setResponseBody("Sorry, you can't see this page!")
+    }
+  )
+  .match(
+    {
+      path: '/search',
+      query: {
+        q: 'test'
+      }
+    },({ setResponseBody }) => {
+      // arguments: set_response_body, set_status_code, set_done
+      setResponseBody("Sorry, you can't see this page!", 403, true)
+    }
+  )
 
   // Set Variables
   // https://docs.edg.io/guides/v7/performance/rules/features#set-variables
@@ -68,20 +108,32 @@ export default new Router()
   // Follow Redirects
   // https://docs.edg.io/guides/v7/performance/rules/features#follow-redirects
   .match({}, { url: { follow_redirects: true } })
+  .match({}, ({ proxy }) => {
+    proxy('origin', {
+      followRedirects: true
+    })
+  })
+
 
   // Rewrite URL
   // https://docs.edg.io/guides/v7/performance/rules/features#rewrite-url
-  .match('/edgio-redirect/:path*', {
+  .match('/edgio-rewrite/:path*', {
     url: {
       url_rewrite: [
         {
-          source: '/edgio-redirect/:path*:optionalSlash(\\/?)?:optionalQuery(\\?.*)?',
+          source: '/edgio-rewrite/:path*:optionalSlash(\\/?)?:optionalQuery(\\?.*)?',
           syntax: 'path-to-regexp',
           destination: '/:path*:optionalSlash:optionalQuery',
         },
       ],
     },
     origin: { set_origin: 'origin' },
+  })
+  .match('/edgio-rewrite/:path*', ({ rewritePath }) => {
+    rewritePath('/edgio-rewrite/:path*:optionalSlash(\\/?)?:optionalQuery(\\?.*)?', '/:path*:optionalSlash:optionalQuery')
+  })
+  .match('/edgio-rewrite/:path*', ({ updatePath }) => {
+    updatePath('/:path*')
   })
 
   // URL Redirect
@@ -95,4 +147,7 @@ export default new Router()
       },
     },
     origin: { set_origin: 'origin' },
+  })
+  .match('/edgio-redirect/:path*', ({ redirect }) => {
+    redirect('/:path*', { statusCode: 301 })
   })
