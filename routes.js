@@ -1,13 +1,13 @@
 import { Router, edgioRoutes } from '@edgio/core'
-import * as Routers from './routes/index.js'
+import Routers from './routes/index.js'
 
 const edgio = new Router()
   .use(edgioRoutes)
 
 // Iterate over the values of the Routers object
-Object.values(Routers).forEach((Router) => {
+for (const Router of Routers) {
   edgio.use(new Router())
-});
+}
 
 export default edgio
 
